@@ -53,6 +53,16 @@ For SANA, supply the positive native tokens with shape `[B, T, 2304]`, their Boo
 
 SANA learned both endpoints. Its earlier learned-start policy scored 1.5918, and the joint checkpoint scored 1.6199 when forced to end at one. SD 1.5 used a learned start and a fixed end, with a fresh policy trained for each solver and budget. The 8-call comparison used the 6-call learned policy as its control.
 
+**SiT-XL/2 on ImageNet-256, four Euler calls.** FID30k uses the full ADM real reference and one matched generation panel per schedule (30 seeds per class). LPIPS uses 1,024 held-out class/seed pairs. Lower is better for both metrics.
+
+| Schedule | FID30k | VGG-LPIPS |
+|---|---:|---:|
+| Uniform Euler | 95.316 | 0.57306 |
+| Joint learned start/end | 81.906 | 0.42480 |
+| Same joint policy, end forced to 1 | 81.074 | 0.42466 |
+
+Each LPIPS target came from a higher-accuracy DOPRI5 solve of the same frozen class-conditional SiT with the same noise seed, CFG 1.0 and EMA VAE. Validation LPIPS selected update 200 of 200. The paired held-out LPIPS difference for joint minus uniform was -0.14825 (95% case-bootstrap interval [-0.15294, -0.14346]). One policy training seed.
+
 **CIFAR-10 zero-shot budget transfer.** FID50k averaged over five paired panels per row. Lower is better. Both policies trained at four calls. The six- and eight-call rows use the same validation-selected weights without additional training or checkpoint selection.
 
 | Backbone | NFE | Uniform | Learned start only | Joint start/end | Joint, end forced to 1 |
