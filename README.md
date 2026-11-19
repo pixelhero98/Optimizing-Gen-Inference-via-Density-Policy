@@ -53,15 +53,15 @@ For SANA, supply the positive native tokens with shape `[B, T, 2304]`, their Boo
 
 SANA learned both endpoints. Its earlier learned-start policy scored 1.5918, and the joint checkpoint scored 1.6199 when forced to end at one. SD 1.5 used a learned start and a fixed end, with a fresh policy trained for each solver and budget. The 8-call comparison used the 6-call learned policy as its control.
 
-**SiT-XL/2 on ImageNet-256, four Euler calls.** FID30k uses the full ADM real reference and one matched generation panel per schedule (30 seeds per class). LPIPS uses 1,024 held-out class/seed pairs. Lower is better for both metrics.
+**SiT-XL/2 on ImageNet-256.** Validation selected update 200 after training at four Euler calls. For zero-shot transfer, we set both normalized budget inputs to `log(7/5)` and decode six Euler intervals. Both budgets use the same weights, class labels, initial latents and random draws for schedule sampling. Lower is better for both metrics.
 
-| Schedule | FID30k | VGG-LPIPS |
-|---|---:|---:|
-| Uniform Euler | 95.316 | 0.57306 |
-| Joint learned start/end | 81.906 | 0.42480 |
-| Same joint policy, end forced to 1 | 81.074 | 0.42466 |
+| Schedule | FID30k, 4 calls | FID30k, 6 calls | VGG-LPIPS, 4 calls | VGG-LPIPS, 6 calls |
+|---|---:|---:|---:|---:|
+| Uniform Euler | 95.316 | **50.017** | 0.57306 | 0.47094 |
+| Joint learned start/end | 81.906 | 52.271 | 0.42480 | 0.38072 |
+| Same joint policy, end forced to 1 | **81.074** | 51.536 | **0.42466** | **0.38027** |
 
-Each LPIPS target came from a higher-accuracy DOPRI5 solve of the same frozen class-conditional SiT with the same noise seed, CFG 1.0 and EMA VAE. Validation LPIPS selected update 200 of 200. The paired held-out LPIPS difference for joint minus uniform was -0.14825 (95% case-bootstrap interval [-0.15294, -0.14346]). One policy training seed.
+FID30k uses one matched generation panel per schedule and budget (30 seeds per ImageNet class) and the full ADM real reference. VGG-LPIPS uses 1,024 held-out class/seed pairs against a higher-accuracy DOPRI5 solve of the same frozen SiT with the same initial latent, CFG 1.0 and EMA VAE. Joint minus uniform LPIPS was -0.14825 at four calls (paired 95% CI [-0.15294, -0.14346]) and -0.09022 at six ([-0.09603, -0.08449]). One policy training seed.
 
 **CIFAR-10 zero-shot budget transfer.** FID50k averaged over five paired panels per row. Lower is better. Both policies trained at four calls. The six- and eight-call rows use the same validation-selected weights without additional training or checkpoint selection.
 
