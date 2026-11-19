@@ -41,7 +41,19 @@ For SANA, supply the positive native tokens with shape `[B, T, 2304]`, their Boo
 
 ## Results
 
-CIFAR-10 FID50k, lower is better. Each value averages five matched generation panels against the full 50,000-image training reference. NFE 6 and 8 reuse the selected NFE-4 policies with the frozen budget encoding.
+**SANA and Stable Diffusion 1.5.** Mean balanced utility on paired development panels of 512 prompts with two generation seeds each. Higher is better. Intervals are paired 95% prompt-bootstrap intervals.
+
+| Backbone and solver | NFE | Learned schedule | Uniform | Gain over uniform [95% CI] |
+|---|---:|---:|---:|---|
+| SANA 600M, Euler | 4 | 1.6197 | 0.6627 | +0.9570 [+0.8894, +1.0276] |
+| SD 1.5, iPNDM | 4 | 0.9241 | 0.8726 | +0.0515 [+0.0109, +0.0912] |
+| SD 1.5, DPM++(2M) | 4 | 0.9179 | 0.8625 | +0.0555 [+0.0185, +0.0915] |
+| SD 1.5, iPNDM | 6 | 1.1061 | 1.0899 | +0.0162 [-0.0177, +0.0504] |
+| SD 1.5, iPNDM | 8 | 1.1593 | — | — |
+
+SANA learned both endpoints. Its earlier learned-start policy scored 1.5918, and the joint checkpoint scored 1.6199 when forced to end at one. SD 1.5 used a learned start and a fixed end, with a fresh policy trained for each solver and budget. The 8-call comparison used the 6-call learned policy as its control.
+
+**CIFAR-10 zero-shot budget transfer.** FID50k averaged over five paired panels per row. Lower is better. Both policies trained at four calls. The six- and eight-call rows use the same validation-selected weights without additional training or checkpoint selection.
 
 | Backbone | NFE | Uniform | Learned start only | Joint start/end | Joint, end forced to 1 |
 |---|---:|---:|---:|---:|---:|
@@ -52,6 +64,4 @@ CIFAR-10 FID50k, lower is better. Each value averages five matched generation pa
 | OT-CFM | 6 | 18.4901 | 9.5278 | 8.9566 | **8.8815** |
 | OT-CFM | 8 | 14.1358 | 6.9658 | 6.5506 | **6.5349** |
 
-For both backbones the joint checkpoints improved FID over the earlier learned-start policies at all three budgets. Within the same checkpoint, shortening the final step improved 1-RF FID. OT-CFM scored better with its endpoint forced to one. On 1,024 paired teacher cases at NFE 4, joint-policy mean LPIPS was 0.191299 for 1-RF and 0.167997 for OT-CFM.
-
-On the SANA development panel of 512 prompts and two seeds per prompt, mean balanced utility was 1.619656 for joint endpoints, 1.619944 for paired end-one replay, and 1.591836 for the earlier learned-start policy. The paired 95% prompt-bootstrap interval for joint minus end-one utility was [−0.002108, +0.001617]. Each backbone used one training seed.
+The joint policies improved FID over the earlier learned-start policy on all 20 zero-shot panels (2.67%–6.00% lower mean FID). Shortening the final step improved 1-RF FID at both transfer budgets. OT-CFM achieved its lowest FID when forced to end at one. On 1,024 paired teacher cases, transfer LPIPS improved for 1-RF and worsened for OT-CFM relative to learned start alone. Each policy used one training seed.
