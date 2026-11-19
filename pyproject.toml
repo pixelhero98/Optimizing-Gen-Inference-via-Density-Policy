@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "density-grpo"
+version = "1.0.0"
+description = "Conditional density clocks with learned endpoints, trained with antithetic GRPO"
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">=3.11"
+dependencies = ["numpy>=1.26", "torch>=2.5"]
+
+[tool.setuptools]
+license-files = ["LICENSE", "NOTICE"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[project.optional-dependencies]
+test = ["pytest>=8"]
